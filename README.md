@@ -119,10 +119,232 @@ FROM dbo.AdaniStockData_Clean;
 GO
 ```
 
+# 📊 Data Exploration & Analysis on Adani Stock Dataset
+
+After cleaning and preparing the data, we perform exploratory queries to uncover trading trends, stock performance, and investor behavior across Adani Group companies.
+
+
+
+## 🔎 Q1. Total Records in the Dataset
+```sql
+SELECT COUNT(*) AS TotalRecords
+FROM AdaniStockData_Clean;
+````
+
+✅ Tells us **how many trading entries** exist in the dataset.
+
 ---
 
-👉 Next sections will include **Analytical Queries** (returns, volumes, yearly trends, and price comparisons), with insights and possible **visualization ideas** for Tableau/Power BI.
+## 🏢 Q2. Distinct Companies & Symbols
+
+```sql
+SELECT DISTINCT company, symbol 
+FROM AdaniStockData_Clean;
+```
+
+✅ Helps verify **all companies included** and their ticker symbols.
 
 ---
 
-Do you want me to **continue the README and add the analysis queries** (like daily/monthly/yearly returns, volumes, price change) in the same structured style with explanations for each?
+## 📈 Q3. Top 5 Companies by Highest Trading Volumes
+
+```sql
+SELECT TOP 5 company, 
+       SUM(volume) AS HighestVolumeTraded 
+FROM AdaniStockData_Clean
+GROUP BY company 
+ORDER BY SUM(volume) DESC;
+```
+
+✅ Identifies the **most actively traded Adani companies**.
+
+---
+
+## 📉 Q4. Top 5 Companies by Lowest Trading Volumes
+
+```sql
+SELECT TOP 5 company, 
+       SUM(volume) AS LowestVolumeTraded 
+FROM AdaniStockData_Clean
+GROUP BY company 
+ORDER BY SUM(volume) ASC;
+```
+
+✅ Highlights **less active or less popular stocks** in the group.
+
+---
+
+## 📊 Q5. Yearly Average Open & Close Price per Company
+
+```sql
+SELECT 
+    company,
+    YEAR(trade_date) AS TradeYear,
+    ROUND(AVG(open_price), 3) AS AvgOpenPrice, 
+    ROUND(AVG(close_price), 3) AS AvgClosePrice
+FROM AdaniStockData_Clean
+GROUP BY company, YEAR(trade_date)
+ORDER BY company, TradeYear;
+```
+
+✅ Shows **yearly price fluctuations**, helping identify long-term trends.
+
+---
+
+## 📆 Q6. Monthly & Yearly Returns (Cumulative)
+
+```sql
+WITH DailyReturns AS (
+    SELECT 
+        company,
+        symbol,
+        trade_date,
+        YEAR(trade_date) AS TradeYear,
+        MONTH(trade_date) AS TradeMonth,
+        ROUND(((close_price - open_price) / open_price) * 100, 3) AS DailyReturn
+    FROM AdaniStockData_Clean
+    WHERE open_price > 0
+),
+MonthlyReturns AS (
+    SELECT
+        company,
+        symbol,
+        TradeYear,
+        TradeMonth,
+        SUM(DailyReturn) AS MonthlyReturn
+    FROM DailyReturns
+    GROUP BY company, symbol, TradeYear, TradeMonth
+)
+SELECT
+    company,
+    symbol,
+    TradeYear,
+    TradeMonth,
+    MonthlyReturn,
+    SUM(MonthlyReturn) OVER (
+        PARTITION BY company, symbol, TradeYear
+        ORDER BY TradeMonth
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS YearlyReturnRunning
+FROM MonthlyReturns
+ORDER BY company, TradeYear, TradeMonth;
+```
+
+✅ Converts **daily price movements → monthly trends → yearly cumulative returns**.
+➡️ Helps answer: *“Which stocks are winners, losers, consistent, volatile, or seasonal?”*
+
+---
+
+## 📊 Q7. Monthly & Yearly Average Trading Volumes
+
+```sql
+WITH MonthlyAvgVolumes AS (
+    SELECT
+        company,
+        symbol,
+        YEAR(trade_date) AS TradeYear,
+        MONTH(trade_date) AS TradeMonth,
+        ROUND(AVG(volume), 2) AS MonthlyAvgVolume
+    FROM AdaniStockData_Clean
+    GROUP BY company, symbol, YEAR(trade_date), MONTH(trade_date)
+)
+SELECT
+    company,
+    symbol,
+    TradeYear,
+    TradeMonth,
+    MonthlyAvgVolume,
+    ROUND(
+        AVG(MonthlyAvgVolume) OVER (
+            PARTITION BY company, symbol, TradeYear
+            ORDER BY TradeMonth
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ), 2
+    ) AS YearlyAvgVolumeRunning
+FROM MonthlyAvgVolumes
+ORDER BY company, TradeYear, TradeMonth;
+```
+
+✅ Tracks **trading interest over time**.
+➡️ Reveals seasonal/structural shifts & events impacting market activity.
+
+---
+
+## 💰 Q8. Dividends Issued by Companies
+
+```sql
+SELECT company, 
+       SUM(dividends) AS TotalDividends
+FROM AdaniStockData_Clean
+GROUP BY company
+HAVING SUM(dividends) > 0;
+```
+
+✅ Identifies **dividend-paying companies** and their total payouts.
+
+---
+
+## 🪙 Q9. Stock Splits by Company
+
+```sql
+SELECT company, 
+       COUNT(stock_splits) AS TotalSplits
+FROM AdaniStockData_Clean
+WHERE stock_splits > 0
+GROUP BY company;
+```
+
+✅ Tracks **corporate actions** (stock splits) that affect price & liquidity.
+
+---
+
+## 📉 Q10. Monthly & Yearly Price Change (First vs Last Close)
+
+```sql
+WITH MonthlyPriceChange AS (
+    SELECT 
+        company,
+        symbol,
+        YEAR(trade_date) AS TradeYear,
+        MONTH(trade_date) AS TradeMonth,
+        FIRST_VALUE(close_price) OVER (
+            PARTITION BY company, YEAR(trade_date), MONTH(trade_date)
+            ORDER BY trade_date ASC
+        ) AS FirstClose,
+        LAST_VALUE(close_price) OVER (
+            PARTITION BY company, YEAR(trade_date), MONTH(trade_date)
+            ORDER BY trade_date ASC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS LastClose
+    FROM AdaniStockData_Clean
+),
+MonthlyReturn AS (
+    SELECT DISTINCT
+        company,
+        symbol,
+        TradeYear,
+        TradeMonth,
+        ROUND(LastClose - FirstClose, 3) AS MonthlyPriceChange
+    FROM MonthlyPriceChange
+)
+SELECT
+    company,
+    symbol,
+    TradeYear,
+    TradeMonth,
+    MonthlyPriceChange,
+    AVG(MonthlyPriceChange) OVER (
+        PARTITION BY company, symbol, TradeYear
+        ORDER BY TradeMonth
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS YearlyPriceChangeRunning
+FROM MonthlyReturn
+ORDER BY company, TradeYear, TradeMonth;
+```
+
+✅ Measures **stock momentum** by comparing earliest vs latest closing prices.
+➡️ Smooths out daily noise → provides a **clearer picture of long-term trend direction**.
+
+
+
+
