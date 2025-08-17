@@ -4,6 +4,25 @@ This project explores **Adani Group stocks** using SQL for **ETL, transformation
 We load raw stock market data (CSV), clean and transform it into a structured format, and run queries to uncover insights such as returns, volumes, and price trends.
 
 ---
+# 📂 Dataset Information  
+
+This project uses the **Adani Group Stocks Dataset** sourced from Kaggle.  
+It contains historical daily trading data for multiple Adani Group companies.  
+
+**Columns in the dataset:**  
+- `trade_timestamp` → Raw timestamp in nanoseconds since epoch  
+- `symbol` → Stock ticker symbol  
+- `company` → Full company name  
+- `open_price` → Opening price of the stock  
+- `high_price` → Highest trading price during the day  
+- `low_price` → Lowest trading price during the day  
+- `close_price` → Closing price of the stock  
+- `volume` → Total number of shares traded  
+- `dividends` → Dividend issued (if any)  
+- `stock_splits` → Stock split ratio (if any)  
+
+✅ Covers **all major Adani businesses** listed on the Indian stock market.  
+✅ Data is at **daily frequency** and can be aggregated to monthly/yearly levels.  
 
 ## ⚙️ 1. Database Setup
 
