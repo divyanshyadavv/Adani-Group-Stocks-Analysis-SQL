@@ -1,2 +1,4 @@
-# Adani-Group-Stocks-Analysis-SQL
-Adani Group Stocks Analysis explores historical stock data of 11 Adani companies using SQL. The project uncovers trading patterns, price movements.
+📊 Adani Stock Market SQL Analysis
+
+This project explores Adani Group stocks using SQL for ETL, transformation, validation, and analysis.
+We load raw stock market data (CSV), clean and transform it into a structured format, and run queries to uncover insights such as returns, volumes, and price trends.
