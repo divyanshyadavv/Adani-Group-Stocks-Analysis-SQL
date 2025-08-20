@@ -24,7 +24,7 @@ It contains historical daily trading data for multiple Adani Group companies.
  Covers **all major Adani businesses** listed on the Indian stock market.  
  Data is at **daily frequency** and can be aggregated to monthly/yearly levels.  
 
-## ⚙️ 1. Database Setup
+##  1. Database Setup
 
 * **Database Creation**: A dedicated database `AdaniDB` is created.
 * **Raw Table Creation**: A staging table `AdaniStockData` is defined to store raw stock data.
