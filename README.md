@@ -1,10 +1,10 @@
-# 📊 Adani Stock Market SQL Analysis
+# Adani Stock Market SQL Analysis
 
 This project explores **Adani Group stocks** using SQL for **ETL, transformation, validation, and analysis**.
 We load raw stock market data (CSV), clean and transform it into a structured format, and run queries to uncover insights such as returns, volumes, and price trends.
 
 ---
-# 📂 Dataset Information  
+# Dataset Information  
 
 This project uses the **Adani Group Stocks Dataset** sourced from Kaggle.  
 It contains historical daily trading data for multiple Adani Group companies.  
@@ -21,8 +21,8 @@ It contains historical daily trading data for multiple Adani Group companies.
 - `dividends` → Dividend issued (if any)  
 - `stock_splits` → Stock split ratio (if any)  
 
-✅ Covers **all major Adani businesses** listed on the Indian stock market.  
-✅ Data is at **daily frequency** and can be aggregated to monthly/yearly levels.  
+ Covers **all major Adani businesses** listed on the Indian stock market.  
+ Data is at **daily frequency** and can be aggregated to monthly/yearly levels.  
 
 ## ⚙️ 1. Database Setup
 
@@ -72,7 +72,7 @@ GO
 
 ---
 
-## 🔄 2. Data Transformation
+##  2. Data Transformation
 
 * Convert **nanosecond timestamps → human-readable datetime**
 * Fix **invalid prices** (replace negative values with `0`)
@@ -119,7 +119,7 @@ GO
 
 ---
 
-## ✅ 3. ETL Validation Checks
+##  3. ETL Validation Checks
 
 * **Row Count**: Ensures data loaded correctly.
 * **Unique Companies**: Confirms distinct symbols.
@@ -138,34 +138,34 @@ FROM dbo.AdaniStockData_Clean;
 GO
 ```
 
-# 📊 Data Exploration & Analysis on Adani Stock Dataset
+#  Data Exploration & Analysis on Adani Stock Dataset
 
 After cleaning and preparing the data, we perform exploratory queries to uncover trading trends, stock performance, and investor behavior across Adani Group companies.
 
 
 
-## 🔎 Q1. Total Records in the Dataset
+##  Q1. Total Records in the Dataset
 ```sql
 SELECT COUNT(*) AS TotalRecords
 FROM AdaniStockData_Clean;
 ````
 
-✅ Tells us **how many trading entries** exist in the dataset.
+Tells us **how many trading entries** exist in the dataset.
 
 ---
 
-## 🏢 Q2. Distinct Companies & Symbols
+##  Q2. Distinct Companies & Symbols
 
 ```sql
 SELECT DISTINCT company, symbol 
 FROM AdaniStockData_Clean;
 ```
 
-✅ Helps verify **all companies included** and their ticker symbols.
+ -Helps verify **all companies included** and their ticker symbols.
 
 ---
 
-## 📈 Q3. Top 5 Companies by Highest Trading Volumes
+##  Q3. Top 5 Companies by Highest Trading Volumes
 
 ```sql
 SELECT TOP 5 company, 
@@ -175,11 +175,11 @@ GROUP BY company
 ORDER BY SUM(volume) DESC;
 ```
 
-✅ Identifies the **most actively traded Adani companies**.
+ -Identifies the **most actively traded Adani companies**.
 
 ---
 
-## 📉 Q4. Top 5 Companies by Lowest Trading Volumes
+##  Q4. Top 5 Companies by Lowest Trading Volumes
 
 ```sql
 SELECT TOP 5 company, 
@@ -189,11 +189,11 @@ GROUP BY company
 ORDER BY SUM(volume) ASC;
 ```
 
-✅ Highlights **less active or less popular stocks** in the group.
+ -Highlights **less active or less popular stocks** in the group.
 
 ---
 
-## 📊 Q5. Yearly Average Open & Close Price per Company
+##  Q5. Yearly Average Open & Close Price per Company
 
 ```sql
 SELECT 
@@ -206,11 +206,11 @@ GROUP BY company, YEAR(trade_date)
 ORDER BY company, TradeYear;
 ```
 
-✅ Shows **yearly price fluctuations**, helping identify long-term trends.
+ -Shows **yearly price fluctuations**, helping identify long-term trends.
 
 ---
 
-## 📆 Q6. Monthly & Yearly Returns (Cumulative)
+##  Q6. Monthly & Yearly Returns (Cumulative)
 
 ```sql
 WITH DailyReturns AS (
@@ -249,12 +249,12 @@ FROM MonthlyReturns
 ORDER BY company, TradeYear, TradeMonth;
 ```
 
-✅ Converts **daily price movements → monthly trends → yearly cumulative returns**.
-➡️ Helps answer: *“Which stocks are winners, losers, consistent, volatile, or seasonal?”*
+ -Converts **daily price movements → monthly trends → yearly cumulative returns**.
+ -Helps answer: *“Which stocks are winners, losers, consistent, volatile, or seasonal?”*
 
 ---
 
-## 📊 Q7. Monthly & Yearly Average Trading Volumes
+##  Q7. Monthly & Yearly Average Trading Volumes
 
 ```sql
 WITH MonthlyAvgVolumes AS (
@@ -284,12 +284,12 @@ FROM MonthlyAvgVolumes
 ORDER BY company, TradeYear, TradeMonth;
 ```
 
-✅ Tracks **trading interest over time**.
-➡️ Reveals seasonal/structural shifts & events impacting market activity.
+ -Tracks **trading interest over time**.
+- Reveals seasonal/structural shifts & events impacting market activity.
 
 ---
 
-## 💰 Q8. Dividends Issued by Companies
+##  Q8. Dividends Issued by Companies
 
 ```sql
 SELECT company, 
@@ -299,11 +299,11 @@ GROUP BY company
 HAVING SUM(dividends) > 0;
 ```
 
-✅ Identifies **dividend-paying companies** and their total payouts.
+ -Identifies **dividend-paying companies** and their total payouts.
 
 ---
 
-## 🪙 Q9. Stock Splits by Company
+## Q9. Stock Splits by Company
 
 ```sql
 SELECT company, 
@@ -313,11 +313,11 @@ WHERE stock_splits > 0
 GROUP BY company;
 ```
 
-✅ Tracks **corporate actions** (stock splits) that affect price & liquidity.
+ -Tracks **corporate actions** (stock splits) that affect price & liquidity.
 
 ---
 
-## 📉 Q10. Monthly & Yearly Price Change (First vs Last Close)
+## Q10. Monthly & Yearly Price Change (First vs Last Close)
 
 ```sql
 WITH MonthlyPriceChange AS (
@@ -361,8 +361,8 @@ FROM MonthlyReturn
 ORDER BY company, TradeYear, TradeMonth;
 ```
 
-✅ Measures **stock momentum** by comparing earliest vs latest closing prices.
-➡️ Smooths out daily noise → provides a **clearer picture of long-term trend direction**.
+ Measures **stock momentum** by comparing earliest vs latest closing prices.
+- Smooths out daily noise → provides a **clearer picture of long-term trend direction**.
 
 
 
