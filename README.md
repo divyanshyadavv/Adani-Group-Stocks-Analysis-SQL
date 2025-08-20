@@ -4,7 +4,7 @@ This project explores **Adani Group stocks** using SQL for **ETL, transformation
 We load raw stock market data (CSV), clean and transform it into a structured format, and run queries to uncover insights such as returns, volumes, and price trends.
 
 ---
-# Dataset Information  
+#Dataset Information  
 
 This project uses the **Adani Group Stocks Dataset** sourced from Kaggle.  
 It contains historical daily trading data for multiple Adani Group companies.  
